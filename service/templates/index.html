@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Robot Pi Camera Stream & Chat</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 2em; }
+    #chat-box { width: 100%; max-width: 720px; height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 1em; margin-bottom: 1em; }
+    #chat-form { display: flex; gap: 1em; }
+    #message { flex: 1; padding: 0.5em; }
+  </style>
+</head>
+<body>
+  <h1>Robot Pi Camera Stream & Chatbot</h1>
+  <img src="/video_feed" width="720" height="540"><br>
+  <div id="chat-box"></div>
+  <form id="chat-form">
+    <input type="text" id="message" placeholder="Enter your command...">
+    <button type="submit">Send</button>
+  </form>
+
+  <script>
+    const chatBox = document.getElementById('chat-box');
+    const chatForm = document.getElementById('chat-form');
+    const messageInput = document.getElementById('message');
+
+    chatForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const userMsg = messageInput.value;
+      if (!userMsg) return;
+
+      appendToChat('You', userMsg);
+
+      const response = await fetch('/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({ message: userMsg })
+      });
+
+      const data = await response.json();
+      appendToChat('Robot', data.response || JSON.stringify(data));
+      messageInput.value = '';
+    });
+
+    function appendToChat(sender, msg) {
+      const div = document.createElement('div');
+      div.innerHTML = `<strong>${sender}:</strong> ${msg}`;
+      chatBox.appendChild(div);
+      chatBox.scrollTop = chatBox.scrollHeight;
+    }
+  </script>
+</body>
+</html>

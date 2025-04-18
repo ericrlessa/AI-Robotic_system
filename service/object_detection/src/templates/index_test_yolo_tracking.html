@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YOLO Object Detection and Tracking</title>
+</head>
+<body>
+    <h1>YOLO Object Detection and Tracking</h1>
+    <h2>Select an object to track</h2>
+
+    <!-- Object Selection Form -->
+    <form id="object-selection-form">
+        <label for="object-id">Object ID:</label>
+        <input type="number" id="object-id" name="object-id" required><br><br>
+
+        <label for="class-label">Class Label:</label>
+        <input type="text" id="class-label" name="class-label" required><br><br>
+
+        <button type="submit">Select Object</button>
+    </form>
+
+    <h3>Video Feed</h3>
+    <img id="video-feed" src="http://{{ ip_address }}:4000/video_feed" alt="Live Feed", style="width: 640px; height: 480px;">
+    <h3>Tracking Action</h3>
+    <p id="tracking-action">Current Action: Waiting for movement...</p>
+    <script>
+        // Function to send object selection to Flask server
+        function selectObject(id, class_label) {
+            fetch('/select_object', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id: id,
+                    class_label: class_label
+                })
+            })
+            .then(response => response.json())
+            .then(data => alert(data.message))
+            .catch(error => console.error('Error:', error));
+        }
+    
+        // Handle form submission
+        document.getElementById('object-selection-form').addEventListener('submit', function(event) {
+            event.preventDefault();  // Prevent default form submission
+    
+            // Get the object ID and class label from the form inputs
+            const objectId = document.getElementById('object-id').value;
+            const classLabel = document.getElementById('class-label').value;
+    
+            // Send the selected object data to the server for tracking
+            selectObject(objectId, classLabel);
+        });
+    
+        // Function to get and display tracking action
+        function updateTrackingAction() {
+            fetch('/get_tracking_action')
+                .then(response => response.json())
+                .then(data => {
+                    // Update the action on the webpage
+                    document.getElementById('tracking-action').innerText = "Current Action: " + data.action;
+                })
+                .catch(error => console.error('Error:', error));
+        }
+    
+        // Periodically fetch tracking action every 1 second
+        setInterval(updateTrackingAction, 1000);
+    </script>
+</body>
+</html>
+
+

@@ -1,0 +1,6 @@
+venv
+
+# Ignore Python bytecode files
+*.pyc
+__pycache__/
+aws-iot-device-sdk-python-v2/

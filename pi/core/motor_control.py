@@ -34,6 +34,25 @@ def set_motor_speed(motor, speed):
     else:
         motor.stop()
 
+def move_robot(vx, vy, omega):
+    """
+    Controls the robot's movement based on desired velocities in X, Y, and angular (omega).
+    vx: velocity along the X-axis (right/left)
+    vy: velocity along the Y-axis (forward/backward)
+    omega: angular velocity (rotation)
+    """
+    # Calculate the motor speeds based on the inputs
+    s1 = vy - vx - omega  # Motor 1 (front-left)
+    s2 = vy + vx + omega  # Motor 2 (front-right)
+    s3 = vy + vx - omega  # Motor 3 (back-left)
+    s4 = vy - vx + omega  # Motor 4 (back-right)
+    
+    # Apply motor speeds
+    set_motor_speed(motor1, s1)
+    set_motor_speed(motor2, s2)
+    set_motor_speed(motor3, s3)
+    set_motor_speed(motor4, s4)
+
 # Define movement functions for omnidirectional control
 
 def move_robot(vx, vy, omega):

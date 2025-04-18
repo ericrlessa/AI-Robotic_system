@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Luna Chatbot</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #f6f6f6; }
+    h1 { color: #444; }
+    form { margin-bottom: 20px; }
+    .chatbox { padding: 10px; background: white; border-radius: 10px; margin-bottom: 10px; }
+    .user { font-weight: bold; color: #0074D9; }
+    .assistant { font-style: italic; color: #111; }
+  </style>
+</head>
+<body>
+  <h1>🦉 Chat with Luna</h1>
+
+  <form id="chat-form" enctype="multipart/form-data">
+    <input type="text" name="message" placeholder="Type a message..." required>
+    <br><br>
+    <label>Upload image: <input type="file" name="image" accept="image/*"></label>
+    <br><br>
+    <label>Upload voice: <input type="file" name="audio" accept="audio/*"></label>
+    <br><br>
+    <button type="submit">Send</button>
+  </form>
+
+  <div id="chat-log"></div>
+
+  <script>
+    const form = document.getElementById('chat-form');
+    const chatLog = document.getElementById('chat-log');
+
+    form.onsubmit = async (e) => {
+      e.preventDefault();
+      const formData = new FormData(form);
+      const userMsg = formData.get("message");
+      appendMessage("You", userMsg);
+
+      const response = await fetch('/chat', {
+        method: 'POST',
+        body: formData
+      });
+
+      const data = await response.json();
+      appendMessage("Luna", data.response);
+      form.reset();
+    };
+
+    function appendMessage(sender, msg) {
+      const div = document.createElement("div");
+      div.className = "chatbox";
+      div.innerHTML = `<div class="${sender === 'You' ? 'user' : 'assistant'}">${sender}:</div><div>${msg}</div>`;
+      chatLog.appendChild(div);
+      window.scrollTo(0, document.body.scrollHeight);
+    }
+  </script>
+</body>
+</html>
